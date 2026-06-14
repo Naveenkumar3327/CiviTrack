@@ -1,0 +1,29 @@
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build outputs
+dist/
+build/
+bin/
+obj/
+
+# Expo / React Native
+.expo/
+*.jks
+*.p8
+*.keystore
+
+# Editor/OS settings
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Database / Mock database
+mock-db.json
