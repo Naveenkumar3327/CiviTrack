@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Platform } from 'react-native';
 
-// Resolve backend IP dynamically: 10.0.2.2 points to host on Android emulator
-const API_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
+// Production Backend Render server
+const API_URL = 'https://civitrack-backend-yy9q.onrender.com';
 
 const initialState = {
   user: null,
