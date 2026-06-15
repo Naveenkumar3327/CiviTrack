@@ -35,14 +35,25 @@ app.use('/api/users', userRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/location', locationRoutes);
 
+// Serve React production build statically
+app.use(express.static(path.join(__dirname, '../frontend-web/dist')));
+
 // Health check and index info
-app.get('/', (res, response) => {
-  response.status(200).json({
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
     message: '❇️ Welcome to the CiviTrack Civic Grievance System API Server.',
     status: 'online',
     database: global.dbConnected ? 'MongoDB Connected' : 'Offline JSON-File Fallback Active',
     environment: process.env.NODE_ENV || 'development'
   });
+});
+
+// Serve index.html for any other non-API routes (SPA routing support)
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) {
+    return next();
+  }
+  res.sendFile(path.join(__dirname, '../frontend-web/dist/index.html'));
 });
 
 // 404 handler

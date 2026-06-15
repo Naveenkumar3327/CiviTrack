@@ -138,10 +138,10 @@ export default function MapDashboard({ complaints = [], onViewDetails }) {
       </div>
 
       {/* Map Content */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'row', position: 'relative', overflow: 'hidden' }}>
+      <div className="map-dashboard-layout">
         
         {/* Left Sidebar List */}
-        <div style={{ width: '320px', borderRight: '1px solid var(--border)', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-card)', overflowY: 'auto' }}>
+        <div className="map-dashboard-list">
           <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border)', fontSize: '0.8rem', color: 'var(--text-light)', fontWeight: 600 }}>
             Matching Complaints ({filteredComplaints.length})
           </div>
@@ -193,7 +193,7 @@ export default function MapDashboard({ complaints = [], onViewDetails }) {
         </div>
 
         {/* Right Map View */}
-        <div style={{ flex: 1, position: 'relative', height: '100%' }}>
+        <div className="map-dashboard-view">
           {selectedId ? (
             (() => {
               const selectedComplaint = filteredComplaints.find(c => (c._id || c.id) === selectedId);

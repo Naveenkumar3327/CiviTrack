@@ -8,7 +8,8 @@ import {
 import { logout } from '../store/authSlice';
 import { 
   ShieldAlert, Sparkles, BarChart3, TrendingUp, Users, LogOut, CheckCircle, 
-  Clock, AlertTriangle, Hammer, CheckSquare, Search, Eye, Filter, Upload, MapPin 
+  Clock, AlertTriangle, Hammer, CheckSquare, Search, Eye, Filter, Upload, MapPin,
+  Menu, X
 } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Polyline } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -21,6 +22,7 @@ export default function AdminDashboard() {
   const { complaints, analytics, loading, analyticsLoading } = useSelector(state => state.complaints);
 
   const [activeSubTab, setActiveSubTab] = useState('list'); // 'list' | 'analytics' | 'notifications'
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [selectedAdminComplaint, setSelectedAdminComplaint] = useState(null);
   
   // Admin Action States
@@ -238,25 +240,58 @@ export default function AdminDashboard() {
   const statuses = ['All', 'Pending', 'Under Review', 'Assigned', 'In Progress', 'Resolved', 'Closed'];
 
   return (
-    <div className="app-container">
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
       
-      {/* ====================================================
-          ADMIN SIDEBAR
-          ==================================================== */}
-      <div className="sidebar" style={{ borderRight: '1px solid var(--border)' }}>
-        <div>
-          <div className="logo-section">
-            <div className="logo-icon" style={{ backgroundColor: 'var(--secondary)' }}>
-              <ShieldAlert size={22} />
+      {/* Mobile Top Header */}
+      <div className="mobile-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div className="logo-section" style={{ margin: 0 }}>
+            <div className="logo-icon" style={{ backgroundColor: 'var(--secondary)', width: '32px', height: '32px' }}>
+              <ShieldAlert size={16} color="white" />
             </div>
-            <span className="logo-text">CiviTrack</span>
           </div>
+          <span className="logo-text" style={{ fontSize: '1.2rem' }}>CiviTrack Admin</span>
+        </div>
+        <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)}>
+          <Menu size={20} />
+        </button>
+      </div>
+
+      <div className="app-container">
+        
+        {/* Sidebar Overlay for mobile backdrop */}
+        <div 
+          className={`sidebar-overlay ${isSidebarOpen ? 'open' : ''}`} 
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
+        
+        {/* ====================================================
+            ADMIN SIDEBAR
+            ==================================================== */}
+        <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`} style={{ borderRight: '1px solid var(--border)' }}>
+          <div>
+            <div className="logo-section" style={{ justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div className="logo-icon" style={{ backgroundColor: 'var(--secondary)' }}>
+                  <ShieldAlert size={22} />
+                </div>
+                <span className="logo-text">CiviTrack</span>
+              </div>
+              <button 
+                type="button"
+                className="btn-icon mobile-only-close" 
+                style={{ display: 'none' }} 
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
 
           <ul className="menu-list">
             <li>
               <button 
                 className={`menu-link ${activeSubTab === 'list' ? 'active-admin' : ''}`}
-                onClick={() => setActiveSubTab('list')}
+                onClick={() => { setActiveSubTab('list'); setIsSidebarOpen(false); }}
               >
                 <Clock size={18} /> Grievance Queue
               </button>
@@ -264,7 +299,7 @@ export default function AdminDashboard() {
             <li>
               <button 
                 className={`menu-link ${activeSubTab === 'analytics' ? 'active-admin' : ''}`}
-                onClick={() => setActiveSubTab('analytics')}
+                onClick={() => { setActiveSubTab('analytics'); setIsSidebarOpen(false); }}
               >
                 <BarChart3 size={18} /> System Analytics
               </button>
@@ -272,13 +307,13 @@ export default function AdminDashboard() {
             <li>
               <button 
                 className={`menu-link ${activeSubTab === 'notifications' ? 'active-admin' : ''}`}
-                onClick={() => setActiveSubTab('notifications')}
+                onClick={() => { setActiveSubTab('notifications'); setIsSidebarOpen(false); }}
               >
                 <TrendingUp size={18} /> Notification Logs
               </button>
             </li>
             <li style={{ marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
-              <button className="menu-link" onClick={() => navigate('/dashboard')}>
+              <button className="menu-link" onClick={() => { navigate('/dashboard'); setIsSidebarOpen(false); }}>
                 <Users size={18} /> Citizen Mode
               </button>
             </li>
@@ -303,7 +338,11 @@ export default function AdminDashboard() {
           </div>
 
           <div className="flex-row" style={{ marginTop: '1rem', justifyContent: 'flex-end' }}>
-            <button className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', width: '100%' }} onClick={handleAdminLogout}>
+            <button 
+              className="btn btn-outline" 
+              style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', width: '100%' }} 
+              onClick={() => { handleAdminLogout(); setIsSidebarOpen(false); }}
+            >
               <LogOut size={14} /> Close Session
             </button>
           </div>
@@ -372,10 +411,11 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            <div className="grid-3" style={{ gridTemplateColumns: '2fr 1fr', alignItems: 'start' }}>
+            <div className="responsive-grid-3" style={{ alignItems: 'start' }}>
               
               {/* Complaints Table */}
-              <div className="card flex-column" style={{ padding: '1rem', overflowX: 'auto' }}>
+              <div className="card flex-column" style={{ padding: '1rem' }}>
+                <div className="table-responsive">
                 
                 {/* Search / Filters */}
                 <div className="flex-row" style={{ flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
@@ -443,6 +483,7 @@ export default function AdminDashboard() {
                     ))}
                   </tbody>
                 </table>
+                </div>
               </div>
 
               {/* Action Control Panel */}
@@ -852,6 +893,7 @@ export default function AdminDashboard() {
 
       </div>
 
+    </div>
     </div>
   );
 }

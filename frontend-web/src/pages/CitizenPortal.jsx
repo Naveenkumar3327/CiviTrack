@@ -7,7 +7,8 @@ import MapDashboard from '../components/MapDashboard';
 import { MapContainer, TileLayer, Marker, useMapEvents, Polyline } from 'react-leaflet';
 import { 
   FileText, Map, User, LogOut, Sun, Moon, PlusCircle, Sparkles, Upload, 
-  MapPin, CheckCircle, ArrowRight, Eye, ThumbsUp, Bell, Heart, ShieldAlert 
+  MapPin, CheckCircle, ArrowRight, Eye, ThumbsUp, Bell, Heart, ShieldAlert,
+  Menu, X
 } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
@@ -38,6 +39,7 @@ export default function CitizenPortal() {
   const { complaints, loading, submitLoading, error } = useSelector(state => state.complaints);
 
   const [activeTab, setActiveTab] = useState('feed'); // 'feed' | 'report' | 'profile' | 'map'
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light');
 
   // Filter States
@@ -407,25 +409,56 @@ export default function CitizenPortal() {
   };
 
   return (
-    <div className="app-container">
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', width: '100%' }}>
       
-      {/* ====================================================
-          SIDEBAR NAVIGATION
-          ==================================================== */}
-      <div className="sidebar">
-        <div>
-          <div className="logo-section">
-            <div className="logo-icon">
-              <Sparkles size={22} />
-            </div>
-            <span className="logo-text">CiviTrack</span>
+      {/* Mobile Top Header */}
+      <div className="mobile-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <div className="logo-icon" style={{ width: '32px', height: '32px' }}>
+            <Sparkles size={16} />
           </div>
+          <span className="logo-text" style={{ fontSize: '1.2rem' }}>CiviTrack</span>
+        </div>
+        <button className="hamburger-btn" onClick={() => setIsSidebarOpen(true)}>
+          <Menu size={20} />
+        </button>
+      </div>
+
+      <div className="app-container">
+        
+        {/* Sidebar Overlay for mobile backdrop */}
+        <div 
+          className={`sidebar-overlay ${isSidebarOpen ? 'open' : ''}`} 
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
+        
+        {/* ====================================================
+            SIDEBAR NAVIGATION
+            ==================================================== */}
+        <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+          <div>
+            <div className="logo-section" style={{ justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <div className="logo-icon">
+                  <Sparkles size={22} />
+                </div>
+                <span className="logo-text">CiviTrack</span>
+              </div>
+              <button 
+                type="button"
+                className="btn-icon mobile-only-close" 
+                style={{ display: 'none' }} 
+                onClick={() => setIsSidebarOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
 
           <ul className="menu-list">
             <li>
               <button 
                 className={`menu-link ${activeTab === 'feed' ? 'active' : ''}`}
-                onClick={() => setActiveTab('feed')}
+                onClick={() => { setActiveTab('feed'); setIsSidebarOpen(false); }}
               >
                 <FileText size={18} /> Community Feed
               </button>
@@ -433,7 +466,7 @@ export default function CitizenPortal() {
             <li>
               <button 
                 className={`menu-link ${activeTab === 'map' ? 'active' : ''}`}
-                onClick={() => setActiveTab('map')}
+                onClick={() => { setActiveTab('map'); setIsSidebarOpen(false); }}
               >
                 <Map size={18} /> Interactive Map
               </button>
@@ -443,8 +476,8 @@ export default function CitizenPortal() {
                 className={`menu-link ${activeTab === 'report' ? 'active' : ''}`}
                 onClick={() => {
                   setActiveTab('report');
-                  // Trigger geocoding for default coords on mount
                   reverseGeocode(coords[0], coords[1]);
+                  setIsSidebarOpen(false);
                 }}
               >
                 <PlusCircle size={18} style={{ color: 'var(--secondary)' }} /> Report Grievance
@@ -453,7 +486,7 @@ export default function CitizenPortal() {
             <li>
               <button 
                 className={`menu-link ${activeTab === 'profile' ? 'active' : ''}`}
-                onClick={() => setActiveTab('profile')}
+                onClick={() => { setActiveTab('profile'); setIsSidebarOpen(false); }}
               >
                 <User size={18} /> Citizen Profile
               </button>
@@ -463,7 +496,7 @@ export default function CitizenPortal() {
               <li style={{ marginTop: '1rem', borderTop: '1px solid var(--border)', paddingTop: '1rem' }}>
                 <button 
                   className="menu-link active-admin"
-                  onClick={() => navigate('/admin')}
+                  onClick={() => { navigate('/admin'); setIsSidebarOpen(false); }}
                 >
                   <Sparkles size={18} /> Admin Command
                 </button>
@@ -495,7 +528,11 @@ export default function CitizenPortal() {
             <button className="btn-icon" onClick={toggleTheme}>
               {theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
             </button>
-            <button className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }} onClick={handleLogout}>
+            <button 
+              className="btn btn-outline" 
+              style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }} 
+              onClick={() => { handleLogout(); setIsSidebarOpen(false); }}
+            >
               <LogOut size={14} /> Log Out
             </button>
           </div>
@@ -841,7 +878,7 @@ export default function CitizenPortal() {
 
               <div className="card flex-column">
                 <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem' }}>Account Statistics</h3>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', height: '100%' }}>
+                <div className="responsive-grid-2" style={{ height: '100%' }}>
                   <div className="glass flex-column" style={{ padding: '1.25rem', borderRadius: 'var(--radius-md)', alignContent: 'center', textAlign: 'center', justifyContent: 'center' }}>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-light)' }}>Reported Grievances</span>
                     <span style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--primary)' }}>
@@ -1073,7 +1110,7 @@ export default function CitizenPortal() {
               {/* Photos before/after */}
               <div>
                 <h5 style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-light)', marginBottom: '0.5rem' }}>Photo Evidence</h5>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div className="responsive-grid-2">
                   <div>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-light)', display: 'block', marginBottom: '0.25rem' }}>Reported State (Before)</span>
                     <div style={{ width: '100%', height: '140px', borderRadius: '6px', overflow: 'hidden', border: '1px solid var(--border)' }}>
@@ -1154,6 +1191,7 @@ export default function CitizenPortal() {
         </div>
       )}
 
+      </div>
     </div>
   );
 }
