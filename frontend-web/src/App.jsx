@@ -5,6 +5,7 @@ import store from './store';
 import Login from './pages/Login';
 import CitizenPortal from './pages/CitizenPortal';
 import AdminDashboard from './pages/AdminDashboard';
+import { Analytics } from '@vercel/analytics/react';
 
 export default function App() {
   return (
@@ -24,6 +25,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </BrowserRouter>
+      <Analytics />
     </Provider>
   );
 }
