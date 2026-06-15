@@ -22,8 +22,9 @@ const protect = async (req, res, next) => {
       }
 
       // Add user info to request (excluding password)
-      const { password, ...userWithoutPassword } = user;
-      req.user = { id: user._id || user.id, ...userWithoutPassword };
+      const userObj = user.toObject ? user.toObject() : user;
+      const { password, ...userWithoutPassword } = userObj;
+      req.user = { id: userObj._id ? userObj._id.toString() : userObj.id, ...userWithoutPassword };
 
       next();
     } catch (error) {

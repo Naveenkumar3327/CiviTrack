@@ -15,7 +15,8 @@ const getProfile = async (req, res) => {
     const complaints = await Complaint.find({ 'citizen.id': req.user.id });
 
     // Exclude password from output
-    const { password, ...safeUser } = user;
+    const userObj = user.toObject ? user.toObject() : user;
+    const { password, ...safeUser } = userObj;
 
     return res.status(200).json({
       success: true,
@@ -50,7 +51,8 @@ const updateProfile = async (req, res) => {
     if (profilePicture !== undefined) updates.profilePicture = profilePicture;
 
     const updatedUser = await User.findByIdAndUpdate(req.user.id, updates, { new: true });
-    const { password, ...safeUser } = updatedUser;
+    const updatedUserObj = updatedUser.toObject ? updatedUser.toObject() : updatedUser;
+    const { password, ...safeUser } = updatedUserObj;
 
     return res.status(200).json({
       success: true,
